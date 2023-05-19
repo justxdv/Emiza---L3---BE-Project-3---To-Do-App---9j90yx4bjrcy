@@ -48,9 +48,7 @@ json =
 async function isowner(req, res, next) {
 
     try {
-        
-        //Write your code here.
-         // check token validity
+        // check token validity
         const { token, task_id } = req.body;
         let decodedToken;
         try {
@@ -65,7 +63,7 @@ async function isowner(req, res, next) {
         // check if task exists
         const task = await Tasks.findById(task_id);
         if (!task) {
-            return res.status(404).json({
+            return res.status(404).json({  // <--- change this line
                 status: 'fail',
                 message: 'Given task does not exist',
             });
