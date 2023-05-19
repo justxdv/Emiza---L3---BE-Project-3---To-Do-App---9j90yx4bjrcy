@@ -112,9 +112,23 @@ json = {
 
 const updateTask = async (req, res) => {
     
-    const task_id = req.body.task_id;
-    //Write your code here.
-}
+    try {
+        const task_id = req.body.task_id;
+        const { heading, description, status } = req.body;
+
+        const task = await Tasks.findByIdAndUpdate(task_id, { heading, description, status }, { new: true });
+
+        res.status(200).json({
+            status: 'success',
+            data: task
+        })
+    } catch (err) {
+        res.status(500).json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};
 
 
 /*
@@ -152,10 +166,21 @@ json = {
 
 const deleteTask = async (req, res) => {
 
-    const task_id = req.body.task_id;
-    //Write your code here.
+   try {
+        const task_id = req.body.task_id;
+        await Tasks.findByIdAndRemove(task_id);
 
-}
+        res.status(200).json({
+            status: 'success',
+            message: 'Task deleted successfully'
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};
 
 
 module.exports = { createTask, getdetailTask, updateTask, deleteTask };
