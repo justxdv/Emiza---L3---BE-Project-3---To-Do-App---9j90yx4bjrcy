@@ -112,23 +112,23 @@ json = {
 
 const updateTask = async (req, res) => {
     
-    try {
-        const task_id = req.body.task_id;
-        const { heading, description, status } = req.body;
+    try{
+        const {task_id, heading, description, status} = req.body;
+        //Write your code here.
+        const update = {};
+        if(heading) update.heading = heading;
+        if(description) update.description = description;
+        if(status) update.status = status;
 
-        const task = await Tasks.findByIdAndUpdate(task_id, { heading, description, status }, { new: true });
+        const task = await Tasks.findOneAndUpdate({_id : task_id}, update, {new : true});
 
-        res.status(200).json({
-            status: 'success',
-            data: task
-        })
-    } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            message: err.message
-        });
+        return res.status(200).json({status : "success", data : task});
     }
-};
+    catch(err){
+        return res.status(404).json({ message: err.message, status: 'fail' });
+    }
+        
+}
 
 
 /*
@@ -166,21 +166,19 @@ json = {
 
 const deleteTask = async (req, res) => {
 
-   try {
+    try{
         const task_id = req.body.task_id;
-        await Tasks.findByIdAndRemove(task_id);
-
-        res.status(200).json({
-            status: 'success',
-            message: 'Task deleted successfully'
-        });
-    } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            message: err.message
-        });
+        //Write your code here.
+        const task = await Tasks.findById(task_id);
+        const result = await Tasks.deleteOne(task);
+    
+        if(result) return res.status(200).json({ message: 'Task deleted successfully', status: 'success' });
     }
-};
+    catch(err){
+        return res.status(404).json({ message: err.message, status: 'fail' });
+    }
+
+}
 
 
 module.exports = { createTask, getdetailTask, updateTask, deleteTask };
