@@ -48,40 +48,32 @@ json =
 async function isowner(req, res, next) {
 
     try {
-        // check token validity
-        const { token, task_id } = req.body;
-        let decodedToken;
-        try {
-            decodedToken = jwt.verify(token, JWT_SECRET);
-        } catch (err) {
-            return res.status(404).json({
-                status: 'fail',
-                message: 'Invalid token',
-            });
+        
+        //Write your code here.
+        const {task_id, token} = req.body;
+        let tokenData;
+        try{
+            tokenData = jwt.verify(token, JWT_SECRET);
+        }
+        catch(err){
+            return res.status(404).json({ message: 'Invalid token', status: 'fail' });
         }
 
-        // check if task exists
+        if (!task_id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(404).json({ message: 'Given task doesnot exist', status: 'fail' });
+        }
+
         const task = await Tasks.findById(task_id);
-        if (!task) {
-            return res.status(404).json({  // <--- change this line
-                status: 'fail',
-                message: 'Given task does not exist',
-            });
-        }
+        if(!task) return res.status(404).json({ message: 'Given task does not exist', status: 'fail' });
 
-        // check if user is the creator of the task
-        if (task.creator_id != decodedToken.userId) {
-            return res.status(403).json({
-                status: 'fail',
-                message: 'Access Denied',
-            });
-        }
+        if(tokenData.userId != task.creator_id) return res.status(403).json({ message: 'Access Denied' , status: 'fail' });
 
-        // all checks passed, user can proceed
         next();
+
 
     } catch (err) {
         return res.status(400).json({
+            error : err.message,
             status: "error",
             message: "Unable to check"
         })
